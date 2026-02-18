@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "ButtonWidget.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
 #include "GameMenuWidget.generated.h"
 
 /**
@@ -14,4 +18,33 @@ class VGP201_API UGameMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void NativeConstruct() override;
+
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* HealthBar;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* TimerText;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* ScoreText;
+
+	UPROPERTY(meta = (BindWidget))
+	UVerticalBox* ButtonContainer;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UButtonWidget> ButtonWidgetClass;
+
+	UFUNCTION()
+	void UpdateHealthBar(float HealthPercent);
+
+	UFUNCTION()
+	void SetScoreText(int amount);
+
+	UFUNCTION()
+	void SetTimerText(int timer);
+
+private:
+	int UIScore; // Probably should put this in GameMode or score manager of some sort
 };

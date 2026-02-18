@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameHUD.h"
 #include "Logging/StructuredLog.h"	
+#include "Kismet/GameplayStatics.h"
+#include "FPSCharacter.h"
 #include "FPSProjectGameMode.generated.h"
 
 /**
@@ -16,4 +19,14 @@ class VGP201_API AFPSProjectGameMode : public AGameModeBase
 	GENERATED_BODY()
 	
 	virtual void StartPlay() override;
+
+	UFUNCTION()
+	void HandlePlayerDied();
+
+	UFUNCTION()
+	void GoToGameOver();
+
+public:
+	UFUNCTION()
+	void GoToMainMenu();
 };

@@ -9,7 +9,10 @@ void AGameHUD::BeginPlay()
 {
 	Super::BeginPlay();
 	//2. Slates Method of making UI
-	ShowSettingsMenu();
+	//ShowSettingsMenu();
+
+	// 3. UMG Method of making UI (See GameMenuWidget)
+	SpawnGameMenu(StartingGameWidget);
 }
 
 void AGameHUD::DrawHUD()
@@ -27,8 +30,8 @@ void AGameHUD::DrawHUD()
 	float CrosshairWidth = CrosshairTexture->GetSurfaceWidth();
 	float CrosshairHeight = CrosshairTexture->GetSurfaceHeight();
 
-	float AlignmentOffsetX = 0.5f;
-	float AlignmentOffsetY = 0.5f;
+	float AlignmentOffsetX = 2.5f;
+	float AlignmentOffsetY = 3.0f;
 	FVector2D CrosshairPosOffset(CrosshairWidth * AlignmentOffsetX, CrosshairHeight * AlignmentOffsetY);
 
 	// Draw Settings
@@ -56,6 +59,20 @@ void AGameHUD::ShowSettingsMenu()
 void AGameHUD::HideSettingsMenu()
 {
 	GEngine->GameViewport->RemoveViewportWidgetContent(SettingsWidgetContainer.ToSharedRef());
+
+	PlayerOwner->bShowMouseCursor = false;
+	PlayerOwner->SetInputMode(FInputModeGameOnly());
+}
+
+void AGameHUD::SpawnGameMenu(TSubclassOf<UGameMenuWidget> NewGameMenuWidget)
+{
+	if (GameMenuWidgetContainer) {
+		GameMenuWidgetContainer->RemoveFromParent();
+		GameMenuWidgetContainer = nullptr;
+	}
+
+	GameMenuWidgetContainer = CreateWidget<UGameMenuWidget>(GetWorld(), NewGameMenuWidget);
+	GameMenuWidgetContainer->AddToViewport();
 
 	PlayerOwner->bShowMouseCursor = false;
 	PlayerOwner->SetInputMode(FInputModeGameOnly());

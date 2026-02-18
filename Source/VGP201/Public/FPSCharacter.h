@@ -6,8 +6,13 @@
 #include "Components/CapsuleComponent.h"
 #include "CoreMinimal.h"
 #include "FPSProjectile.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameHUD.h"
 #include "GameFramework/Character.h"
+class UPauseMenuWidget;
 #include "FPSCharacter.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerDied);
 
 //class UCapsuleComponent;	Useless with the #Include above
 
@@ -43,6 +48,16 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AFPSProjectile> ProjectileClass;	//Let's you have subclass and it's children as well
 
+	UPROPERTY(EditAnywhere)
+	FOnPlayerDied OnPlayerDied;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> PauseMenuClass;
+
+	UPROPERTY()
+	class UPauseMenuWidget* PauseMenu;
+	bool GameIsPaused = false;	
+
 	UFUNCTION()
 	void OnMoveForward(float Value);
 
@@ -57,5 +72,17 @@ public:
 
 	UFUNCTION()
 	void Fire();
+
+	UFUNCTION()
+	void OnHurtPlayer(float DamageAmount);
+
+	UFUNCTION()
+	void PauseGame();
+
+	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+private:
+	float Health = 100.0f;
+	float MaxHealth = 100.0f;	//Should make this a health actor component later
 
 };

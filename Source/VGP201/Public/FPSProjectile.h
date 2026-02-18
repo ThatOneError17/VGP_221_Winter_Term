@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "AI/EnemyAICharacter.h"
 #include "FPSProjectile.generated.h"
 
 UCLASS()

@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+
 #include "FPSCharacter.h"
+#include "PauseMenu/PauseMenuWidget.h"	//I don't know why, but I had to include this here to avoid an error
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
@@ -41,6 +43,8 @@ void AFPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	AGameHUD* HUD = UGameplayStatics::GetPlayerController(this, 0)->GetHUD<AGameHUD>();
+	HUD->GameMenuWidgetContainer->UpdateHealthBar(Health/MaxHealth);
 }
 
 // Called every frame
@@ -65,6 +69,8 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::EndJump);
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSCharacter::Fire);
+
+	PlayerInputComponent->BindAction("Pause", IE_Pressed, this, &AFPSCharacter::PauseGame);
 }
 	
 
@@ -101,12 +107,12 @@ void AFPSCharacter::Fire()
 	FRotator CameraRotation;
 	GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
-	MuzzleOffset.Set(100.0f, 0.0f, 0.0f);
+	MuzzleOffset.Set(20.0f, 0.0f, 0.0f);
 
 	FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
 
 	FRotator MuzzleRotation = CameraRotation;
-	MuzzleRotation.Pitch += 10.0f;
+	//MuzzleRotation.Pitch += 10.0f;
 
 	// Start of spawning the projectile
 	UWorld* World = GetWorld();
@@ -123,5 +129,96 @@ void AFPSCharacter::Fire()
 	// Launch spawned projectile in the camera rotation
 	FVector LaunchDirection = MuzzleRotation.Vector();
 	Projectile->FireInDirection(LaunchDirection);
+
+	//OnHurtPlayer(10.0f);	//Debug for losing health when firing
+}
+
+void AFPSCharacter::OnHurtPlayer(float DamageAmount)
+{
+	if (DamageAmount <= 0.0f) 
+		return;
+
+	if (Health <= 0.0f)
+		return;
+
+	
+	Health -= DamageAmount;
+
+	AGameHUD* HUD = UGameplayStatics::GetPlayerController(this, 0)->GetHUD<AGameHUD>();
+	HUD->GameMenuWidgetContainer->UpdateHealthBar(Health / MaxHealth);
+
+	if (Health <= 0.0f)
+	{
+		OnPlayerDied.Broadcast();
+	}
+}
+
+void AFPSCharacter::PauseGame()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+	if (!PC) return;
+
+	if (!GameIsPaused)
+	{
+		if (!PauseMenuClass) return; //safety check
+
+		//Destroy previous instance if exists
+		if (PauseMenu)
+		{
+			PauseMenu->RemoveFromParent();
+			PauseMenu = nullptr;
+		}
+
+		//Create a new instance
+		PauseMenu = CreateWidget<UPauseMenuWidget>(PC, PauseMenuClass);
+		if (PauseMenu)
+		{
+			//Bind Resume button delegate
+			PauseMenu->OnResumeClicked.BindUObject(this, &AFPSCharacter::PauseGame);
+
+			//Add to viewport
+			PauseMenu->AddToViewport();
+
+			//Pause game
+			UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+			//Show mouse
+			PC->bShowMouseCursor = true;
+
+			//Set UI input mode
+			FInputModeUIOnly InputMode;
+			InputMode.SetWidgetToFocus(PauseMenu->GetCachedWidget());
+			PC->SetInputMode(InputMode);
+
+			GameIsPaused = true;
+		}
+	}
+	else
+	{
+		//Remove and destroy pause menu
+		if (PauseMenu)
+		{
+			PauseMenu->RemoveFromParent();
+			PauseMenu = nullptr;	//Should hopefully fix the resume button issue
+		}
+
+		//Unpause game
+		UGameplayStatics::SetGamePaused(GetWorld(), false);
+
+		// Hide mouse
+		PC->bShowMouseCursor = false;
+
+		//Game input mode
+		FInputModeGameOnly InputMode;
+		PC->SetInputMode(InputMode);
+
+		GameIsPaused = false;
+	}
+}
+
+float AFPSCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	OnHurtPlayer(DamageAmount);
+	return DamageAmount;
 }
 

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
 #include "Engine/Canvas.h"
+#include "GameMenuWidget.h"
 #include "GUI/SlateExample/SSSettingsWidget.h"
 #include "GameHUD.generated.h"
 
@@ -27,6 +28,13 @@ public:
 
 	void ShowSettingsMenu();
 	void HideSettingsMenu();
+
+	// 3. UMG Method of making UI (See GameMenuWidget)
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameMenuWidget> StartingGameWidget;
+	UGameMenuWidget* GameMenuWidgetContainer;
+
+	void SpawnGameMenu(TSubclassOf<UGameMenuWidget> NewGameMenuWidget);
 
 
 public:
