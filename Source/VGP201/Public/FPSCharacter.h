@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "AI/EnemyAICharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "CoreMinimal.h"
@@ -75,6 +76,9 @@ public:
 
 	UFUNCTION()
 	void OnHurtPlayer(float DamageAmount);
+
+	UFUNCTION()
+	void OnHealPlayer(float HealAmount);
 
 	UFUNCTION()
 	void PauseGame();

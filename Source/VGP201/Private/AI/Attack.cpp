@@ -8,12 +8,12 @@ EBTNodeResult::Type UAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint
 	AAIController* EnemyController = OwnerComp.GetAIOwner();
 
 	//Method 1: Built in damage system
-	AFPSCharacter* PlayerCharacter = Cast<AFPSCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	UGameplayStatics::ApplyDamage(PlayerCharacter, 1.0f, EnemyController, EnemyController->GetPawn(), UDamageType::StaticClass());
+	//AFPSCharacter* PlayerCharacter = Cast<AFPSCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	//UGameplayStatics::ApplyDamage(PlayerCharacter, 1.0f, EnemyController, EnemyController->GetPawn(), UDamageType::StaticClass());
 
 	//Method 2: Calling playerhurt function directly
-	//AFPSCharacter* PlayerCharacter = Cast<AFPSCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	//PlayerCharacter->OnHurtPlayer(1.0f);
+	AFPSCharacter* PlayerCharacter = Cast<AFPSCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	PlayerCharacter->OnHurtPlayer(10.0f);
 
 	//Method 3: Using Pawn 
 	//AEnemyAICharacter* EnemyCharacter = Cast<AEnemyAICharacter>(EnemyController->GetPawn());

@@ -46,12 +46,30 @@ void AFPSProjectGameMode::StartPlay()
 		Player->OnPlayerDied.AddDynamic(this, &AFPSProjectGameMode::HandlePlayerDied);
 	}
 
+	GetWorldTimerManager().SetTimer(GameTimerHandle, this, &AFPSProjectGameMode::UpdateGameTimer, 1.0f, true);	//UpdateGameTimer will be called every second (1.0f) and will loop 
 }
 
 void AFPSProjectGameMode::HandlePlayerDied()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Player Died!"));
+	TArray<AActor*> FoundSpawners;	//Gets all enemy spawners in the level and stops them from spawning more enemies when the player dies
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemySpawner::StaticClass(), FoundSpawners);
+
+	for (AActor* Actor : FoundSpawners)
+	{
+		AEnemySpawner* Spawner = Cast<AEnemySpawner>(Actor);
+		if (Spawner)
+		{
+			Spawner->StopSpawning();	//Calls the StopSpawning function
+		}
+	}
+
 	GoToGameOver();
+}
+
+void AFPSProjectGameMode::HandleEnemyDied(AEnemyAICharacter* Enemy)
+{
+	UpdateScore(10);	//Update the score by 10 points when an enemy dies
 }
 
 void AFPSProjectGameMode::GoToGameOver()
@@ -65,6 +83,38 @@ void AFPSProjectGameMode::GoToMainMenu()
 	UE_LOG(LogTemp, Warning, TEXT("Going to Main Menu"));
 	UGameplayStatics::OpenLevel(this, FName("MainMenu"));
 }
+
+void AFPSProjectGameMode::UpdateGameTimer()
+{
+	ElapsedTime++;
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+	if (!PC) return;
+
+	AGameHUD* HUD = PC->GetHUD<AGameHUD>();
+	if (!HUD) return;
+
+	if (HUD->GameMenuWidgetContainer)
+	{
+		HUD->GameMenuWidgetContainer->SetTimerText(ElapsedTime);
+	}
+}
+
+void AFPSProjectGameMode::UpdateScore(int ScoreAmount)	//Updates the score text in the HUD when an enemy dies, and is called from HandleEnemyDied
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+	if (!PC) return;
+
+	AGameHUD* HUD = PC->GetHUD<AGameHUD>();
+	if (!HUD) return;
+
+	if(HUD->GameMenuWidgetContainer)
+	{
+		HUD->GameMenuWidgetContainer->SetScoreText(ScoreAmount);
+	}
+}
+
+
 
 
 

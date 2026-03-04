@@ -15,6 +15,7 @@ AEnemyAICharacter::AEnemyAICharacter()
 void AEnemyAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	
 }
 
@@ -38,6 +39,7 @@ void AEnemyAICharacter::OnEnemyTakeDamage(float InDamageAmount)
 
 	if(Health <= 0)
 	{
+		OnEnemyDied.Broadcast(this);
 		Destroy();
 	}
 }

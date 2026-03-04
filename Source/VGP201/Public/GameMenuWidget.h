@@ -46,5 +46,5 @@ public:
 	void SetTimerText(int timer);
 
 private:
-	int UIScore; // Probably should put this in GameMode or score manager of some sort
+	int UIScore; //Probably should put this in GameMode or score manager of some sort
 };

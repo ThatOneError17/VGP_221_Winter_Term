@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AI/EnemySpawner.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameHUD.h"
 #include "Logging/StructuredLog.h"	
@@ -23,10 +24,25 @@ class VGP201_API AFPSProjectGameMode : public AGameModeBase
 	UFUNCTION()
 	void HandlePlayerDied();
 
+
+
 	UFUNCTION()
 	void GoToGameOver();
 
 public:
 	UFUNCTION()
 	void GoToMainMenu();
+
+	UFUNCTION()
+	void HandleEnemyDied(AEnemyAICharacter* Enemy);
+
+	FTimerHandle GameTimerHandle;	
+
+	int32 ElapsedTime = 0;
+
+	UFUNCTION()
+	void UpdateGameTimer();
+
+	UFUNCTION()
+	void UpdateScore(int ScoreAmount);
 };

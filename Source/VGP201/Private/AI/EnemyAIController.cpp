@@ -25,9 +25,18 @@ void AEnemyAIController::BeginPlay()
 	RunBehaviorTree(StartingBehaviorTree);
 
 
-	//Setting Blackboard BBDamageAmount
-	UBlackboardComponent* BlackBoardComp = GetBlackboardComponent();
-	BlackBoardComp->SetValueAsFloat(TEXT("BBDamageAmount"), 10.0f);
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+
+	if (PlayerPawn)
+	{
+		UBlackboardComponent* BlackboardComp = GetBlackboardComponent();
+
+		if (BlackboardComp)
+		{
+			BlackboardComp->SetValueAsObject(TEXT("PlayerTarget"), PlayerPawn);
+			BlackboardComp->SetValueAsFloat(TEXT("BBDamageAmount"), 10.0f);
+		}
+	}
 
 }
 

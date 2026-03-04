@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "EnemyAICharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyDied, AEnemyAICharacter*, Enemy);	//Delegate to broadcast when the enemy dies, for updating score
+
+
 UCLASS()
 class VGP201_API AEnemyAICharacter : public ACharacter
 {
@@ -13,7 +16,11 @@ class VGP201_API AEnemyAICharacter : public ACharacter
 
 public:
 	// Sets default values for this character's properties
+	UPROPERTY(BlueprintAssignable)
+	FOnEnemyDied OnEnemyDied;	//Delegate to broadcast when the enemy dies, for updating score
+
 	AEnemyAICharacter();
+
 
 protected:
 	// Called when the game starts or when spawned

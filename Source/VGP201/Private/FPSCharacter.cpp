@@ -144,6 +144,8 @@ void AFPSCharacter::OnHurtPlayer(float DamageAmount)
 	
 	Health -= DamageAmount;
 
+	UE_LOG(LogTemp, Warning, TEXT("Damage Received: %f"), DamageAmount);	//Needed to test where damage was being applied from, and it was working
+
 	AGameHUD* HUD = UGameplayStatics::GetPlayerController(this, 0)->GetHUD<AGameHUD>();
 	HUD->GameMenuWidgetContainer->UpdateHealthBar(Health / MaxHealth);
 
@@ -151,6 +153,19 @@ void AFPSCharacter::OnHurtPlayer(float DamageAmount)
 	{
 		OnPlayerDied.Broadcast();
 	}
+}
+
+void AFPSCharacter::OnHealPlayer(float HealAmount)
+{
+	if (HealAmount <= 0.0f)
+		return;
+	if (Health <= 0.0f)
+		return;
+	Health += HealAmount;
+	Health = FMath::Min(Health, MaxHealth);	//Clamp health to max health
+	UE_LOG(LogTemp, Warning, TEXT("Heal Received: %f"), HealAmount);	//Test for heal
+	AGameHUD* HUD = UGameplayStatics::GetPlayerController(this, 0)->GetHUD<AGameHUD>();
+	HUD->GameMenuWidgetContainer->UpdateHealthBar(Health / MaxHealth);
 }
 
 void AFPSCharacter::PauseGame()
